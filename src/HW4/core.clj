@@ -1,49 +1,76 @@
 (ns HW4.core
-  (require clojure.string)
+  (require clojure.string clojure.tools.trace)
   (:import (java.io BufferedReader FileReader)))
 
 
 ;Problem 1
-(def freq-map {\a 0, \b 0, \c 0, \d 0, \e 0, \f 0, \g 0, \h 0, \i 0, \j 0, \k 0, \l 0, \m 0, \n 0, \o 0, \p 0, \q 0, \r 0, \s 0, \t 0, \u 0, \v 0, \w 0, \y 0, \x 0, \z 0})
 
-(def file "/usr/share/dict/words")
-(def reader (line-seq (BufferedReader. (FileReader. file))))
-(def reader-len (count reader))
+(defn create-freq-map
+  [file]
+  (frequencies 
+    (reduce conj '() 
+            (map first 
+                 (map clojure.string/lower-case 
+                      (clojure.string/split-lines 
+                        (slurp file)))))))
 
 
-(defn read-file-line
-  [freq-map line-num] 
-  (if (not= line-num reader-len)
-    (let 
-      [fchar (first (clojure.string/lower-case (do (nth reader line-num))))]
-;      (println (get freq-map fchar))
-        (read-file-line (assoc freq-map fchar (inc (get freq-map fchar))) (inc line-num)))))
+(create-freq-map "/usr/share/dict/words")
 
-(read-file-line freq-map 0)
+;(clojure.tools.trace/dotrace [create-freq-map] (create-freq-map "/usr/share/dict/words"))
 
 
 ;Problem 2
 
-;(defn remdup
-;  [l]
-;  (loop 
-;    [pos 0
-;     npos 0
-;     nl '()]
-;    (if (< pos (dec (count l)))
-;      (if (= (nth l pos) (nth l (inc pos)))
-;        (recur (inc pos) npos nl)
-;        (recur (inc pos) (inc npos) (conj nl (nth l pos))))
-;      (if (= pos (dec (count l)))
-;        (recur (inc pos) (inc npos) (conj nl (nth l pos)))
-;        (reverse nl))))) 
+;a
+(defn remdup
+  [l]
+  (loop 
+    [pos 0
+     npos 0
+     nl '()]
+    (if (< pos (dec (count l)))
+      (if (= (nth l pos) (nth l (inc pos)))
+        (recur (inc pos) npos nl)
+        (recur (inc pos) (inc npos) (conj nl (nth l pos))))
+      (if (= pos (dec (count l)))
+        (recur (inc pos) (inc npos) (conj nl (nth l pos)))
+        (reverse nl)))))
     
-;(remdup '(:a :b :a :a :a :c :c))
+(remdup '(:a :b :a :a :a :c :c))
+
+;b
+(defn nested-remdup
+  [e]
+  (if (list? e)
+    (loop 
+      [pos 0
+       l e
+       npos 0
+       nl '()]
+      (let
+        [len (count l)
+         item (nth l pos)]
+        (if (< pos (dec len))
+          (if (list? item)
+            (if (not= (nested-remdup item) item)
+              (recur pos (concat (take pos l)(list (nested-remdup item))(drop (inc pos) l)) npos nl))
+            (if (= item (nth l (inc pos)))
+              (recur (inc pos) l npos nl)
+              (recur (inc pos) l (inc npos) (conj nl item))))
+          (if (= pos (dec len))
+            (recur (inc pos) l (inc npos) (conj nl item))
+            (reverse nl)))))
+    e))
+
+; (nested-remdup '(:a :a (:a :a :a) (:a :a :a) :c :c :d :c ((:d :d :a) :a) :a))
 
 
 ;Problem 3
 
-
+(defn next-primes
+  [l]
+  )
 
 
 
