@@ -15,7 +15,7 @@
                         (slurp file)))))))
 
 
-(create-freq-map "/usr/share/dict/words")
+;(create-freq-map "/usr/share/dict/words")
 
 ;(clojure.tools.trace/dotrace [create-freq-map] (create-freq-map "/usr/share/dict/words"))
 
@@ -37,9 +37,10 @@
         (recur (inc pos) (inc npos) (conj nl (nth l pos)))
         (reverse nl)))))
     
-(remdup '(:a :b :a :a :a :c :c))
+;(remdup '(:a :b :a :a :a :c :c))
 
 ;b
+
 (defn nested-remdup
   [e]
   (if (list? e)
@@ -47,23 +48,21 @@
       [pos 0
        l e
        npos 0
-       nl '()]
-      (let
-        [len (count l)
-         item (nth l pos)]
-        (if (< pos (dec len))
-          (if (list? item)
-            (if (not= (nested-remdup item) item)
-              (recur pos (concat (take pos l)(list (nested-remdup item))(drop (inc pos) l)) npos nl))
-            (if (= item (nth l (inc pos)))
-              (recur (inc pos) l npos nl)
-              (recur (inc pos) l (inc npos) (conj nl item))))
-          (if (= pos (dec len))
-            (recur (inc pos) l (inc npos) (conj nl item))
-            (reverse nl)))))
+       nl '()
+       linl '()]
+      (println "pos " pos " l" l " nl " nl " linl " linl)
+      (if (< pos (dec (count l)))
+        (if (and (list? (nth l pos)) (= (.indexOf linl pos) -1))
+          (recur pos (concat (take pos l)(list (nested-remdup (nth l pos)))(drop (inc pos) l)) npos nl (conj linl pos))
+          (if (= (nth l pos) (nth l (inc pos)))
+              (recur (inc pos) l npos nl linl)
+              (recur (inc pos) l (inc npos) (conj nl (nth l pos)) linl)))
+        (if (= pos (dec (count l)))
+            (recur (inc pos) l (inc npos) (conj nl (nth l pos)) linl)
+          (reverse nl))))
     e))
 
-; (nested-remdup '(:a :a (:a :a :a) (:a :a :a) :c :c :d :c ((:d :d :a) :a) :a))
+ (nested-remdup '(:a :a (:a :a :a) (:a :a :a) :c :c :d :c ((:d :d :a) :a) :a))
 
 
 ;Problem 3
