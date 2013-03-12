@@ -50,11 +50,10 @@
        npos 0
        nl '()
        linl '()]
-      (println "pos " pos " l" l " nl " nl " linl " linl)
       (if (< pos (dec (count l)))
         (if (and (list? (nth l pos)) (= (.indexOf linl pos) -1))
           (recur pos (concat (take pos l)(list (nested-remdup (nth l pos)))(drop (inc pos) l)) npos nl (conj linl pos))
-          (if (= (nth l pos) (nth l (inc pos)))
+          (if (= (nth l pos) (nested-remdup (nth l (inc pos))))
               (recur (inc pos) l npos nl linl)
               (recur (inc pos) l (inc npos) (conj nl (nth l pos)) linl)))
         (if (= pos (dec (count l)))
