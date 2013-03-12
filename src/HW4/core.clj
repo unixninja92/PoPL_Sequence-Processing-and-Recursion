@@ -1,10 +1,8 @@
 (ns HW4.core
-  (require clojure.string clojure.tools.trace)
-  (:import (java.io BufferedReader FileReader)))
+  (require clojure.string clojure.tools.trace))
 
 
 ;Problem 1
-
 (defn create-freq-map
   [file]
   (frequencies 
@@ -15,7 +13,7 @@
                         (slurp file)))))))
 
 
-;(create-freq-map "/usr/share/dict/words")
+(create-freq-map "/usr/share/dict/words")
 
 ;(clojure.tools.trace/dotrace [create-freq-map] (create-freq-map "/usr/share/dict/words"))
 
@@ -37,10 +35,10 @@
         (recur (inc pos) (inc npos) (conj nl (nth l pos)))
         (reverse nl)))))
     
-;(remdup '(:a :b :a :a :a :c :c))
+(remdup '(:a :b :a :a :a :c :c))
+
 
 ;b
-
 (defn nested-remdup
   [e]
   (if (list? e)
@@ -66,8 +64,32 @@
 
 ;Problem 3
 
+;b
+(let 
+  [primes []]
+  (map (fn 
+         [n]
+         (if (not-any? (filter #(zero? (rem n %)) primes)
+                 (filter #(<= % (Math/sqrt n)) primes))
+           (lazy-cat primes n)
+           primes))
+       (iterate inc 2)))
+(defn lazy-primes ;;lazy-cat
+  []
+  (for
+    [laz (list)
+     n 2]
+    (if (and
+          (= (count (filter zero? (map #(rem n %) laz))) 0)
+          (= (count (filter #(<= % (Math/sqrt n)) laz)) 0))
+      (recur (lazy-cat laz n) (inc n))
+      (recur laz (inc n)))))
+
+(take 10 lazy-primes)
+;a
 (defn next-primes
   [l]
+  
   )
 
 
