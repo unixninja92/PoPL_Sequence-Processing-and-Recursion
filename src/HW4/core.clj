@@ -71,20 +71,15 @@
     (lazy-primes 2 (lazy-seq)))
   ([num coll]
     (let [step (fn [n primes]
-;                 (println "test")
-                   (if (not-any? (filter #(zero? (rem n %)) (doall primes))
-                                 (filter #(<= % (Math/sqrt n)) (doall primes)))
+                   (if (not-any? #(zero? (rem n %))
+                                 (filter #(<= % (Math/sqrt n)) 
+                                         primes))
                      (let [new-primes (lazy-cat (list n) primes)]
-                       (println "new prime!!")
-                       (cons (list n) (lazy-primes (inc n) new-primes)))
-                     (do
-;                       (println "not prime")
-                       (lazy-primes (inc n) primes))))]
-      (println coll)
-;      (lazy-seq (step num coll)))))
-        (step num coll))))
+                       (cons n (lazy-primes (inc n) new-primes)))
+                       (lazy-primes (inc n) primes)))]
+      (lazy-seq (step num coll)))))
 
-(println (take 10 (lazy-primes)))
+(take 20 (lazy-primes))
 
 ;a
 (defn next-primes
