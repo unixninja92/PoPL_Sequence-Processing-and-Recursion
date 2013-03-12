@@ -13,7 +13,7 @@
                         (slurp file)))))))
 
 
-(create-freq-map "/usr/share/dict/words")
+;(create-freq-map "/usr/share/dict/words")
 
 ;(clojure.tools.trace/dotrace [create-freq-map] (create-freq-map "/usr/share/dict/words"))
 
@@ -35,7 +35,7 @@
         (recur (inc pos) (inc npos) (conj nl (nth l pos)))
         (reverse nl)))))
     
-(remdup '(:a :b :a :a :a :c :c))
+;(remdup '(:a :b :a :a :a :c :c))
 
 
 ;b
@@ -59,33 +59,33 @@
           (reverse nl))))
     e))
 
- (nested-remdup '(:a :a (:a :a :a) (:a :a :a) :c :c :d :c ((:d :d :a) :a) :a))
+; (nested-remdup '(:a :a (:a :a :a) (:a :a :a) :c :c :d :c ((:d :d :a) :a) :a))
 
 
 ;Problem 3
 
 ;b
-(let 
-  [primes []]
-  (map (fn 
-         [n]
-         (if (not-any? (filter #(zero? (rem n %)) primes)
-                 (filter #(<= % (Math/sqrt n)) primes))
-           (lazy-cat primes n)
-           primes))
-       (iterate inc 2)))
-(defn lazy-primes ;;lazy-cat
-  []
-  (for
-    [laz (list)
-     n 2]
-    (if (and
-          (= (count (filter zero? (map #(rem n %) laz))) 0)
-          (= (count (filter #(<= % (Math/sqrt n)) laz)) 0))
-      (recur (lazy-cat laz n) (inc n))
-      (recur laz (inc n)))))
 
-(take 10 lazy-primes)
+(defn lazy-primes ;;lazy-cat
+  ([]
+    (lazy-primes 2 (lazy-seq)))
+  ([num coll]
+    (let [step (fn [n primes]
+;                 (println "test")
+                   (if (not-any? (filter #(zero? (rem n %)) (doall primes))
+                                 (filter #(<= % (Math/sqrt n)) (doall primes)))
+                     (let [new-primes (lazy-cat (list n) primes)]
+                       (println "new prime!!")
+                       (cons (list n) (lazy-primes (inc n) new-primes)))
+                     (do
+;                       (println "not prime")
+                       (lazy-primes (inc n) primes))))]
+      (println coll)
+;      (lazy-seq (step num coll)))))
+        (step num coll))))
+
+(println (take 10 (lazy-primes)))
+
 ;a
 (defn next-primes
   [l]
