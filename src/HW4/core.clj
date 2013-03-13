@@ -64,9 +64,28 @@
 
 ;Problem 3
 
-;b
+;a
+(defn prime? [num]
+  (not-any? #(= (rem num %) 0) 
+       (range 2 (inc(Math/sqrt num)))))
 
-(defn lazy-primes ;;lazy-cat
+(defn next-primes
+  [l]
+  (map (fn [n]
+         (if (prime? n)
+           n
+           (loop
+             [high (inc n)]
+             (if (prime? high)
+                 high
+               (recur (inc high))))))
+       l))
+
+(next-primes '(4 7 34 100 2990 3002))
+
+
+;b
+(defn lazy-primes
   ([]
     (lazy-primes 2 (lazy-seq)))
   ([num coll]
@@ -81,13 +100,31 @@
 
 (take 20 (lazy-primes))
 
-;a
-(defn next-primes
-  [l]
-  
-  )
 
+;Problem 4
+(defn collatz-seq-len
+  ([x]
+    (collatz-seq-len x 0))
+  ([x n]
+  (if (= x 1)
+    n
+    (if (even? x)
+      (collatz-seq-len (/ x 2) (inc n))
+      (collatz-seq-len (+ 1 (* 3 x))(inc n))))))
+    
 
+(defn longest-collatz-seq
+  [x y]
+  (let
+    [ran (range x (inc y))
+     lens (map collatz-seq-len ran)
+     max (apply max lens)
+     pos (.indexOf lens max)]
+    (nth ran pos)))
+
+(collatz-seq-len 1)
+
+(longest-collatz-seq 2 10)
 
 (defn -main
   [& args]
