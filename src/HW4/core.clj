@@ -1,5 +1,4 @@
-(ns HW4.core
-  (require clojure.string clojure.tools.trace))
+(ns HW4.core)
 
 
 ;Problem 1
@@ -13,9 +12,7 @@
                         (slurp file)))))))
 
 
-;(create-freq-map "/usr/share/dict/words")
-
-;(clojure.tools.trace/dotrace [create-freq-map] (create-freq-map "/usr/share/dict/words"))
+(create-freq-map "/usr/share/dict/words")
 
 
 ;Problem 2
@@ -35,7 +32,7 @@
         (recur (inc pos) (inc npos) (conj nl (nth l pos)))
         (reverse nl)))))
     
-;(remdup '(:a :b :a :a :a :c :c))
+(remdup '(:a :b :a :a :a :c :c))
 
 
 ;b
@@ -59,7 +56,7 @@
           (reverse nl))))
     e))
 
-; (nested-remdup '(:a :a (:a :a :a) (:a :a :a) :c :c :d :c ((:d :d :a) :a) :a))
+ (nested-remdup '(:a :a (:a :a :a) (:a :a :a) :c :c :d :c ((:d :d :a) :a) :a))
 
 
 ;Problem 3
@@ -122,10 +119,66 @@
      pos (.indexOf lens max)]
     (nth ran pos)))
 
-(collatz-seq-len 1)
 
 (longest-collatz-seq 2 10)
 
+
+;Problem 5 
+
+(defn x-to-10
+  "Converts a character to it's numeric value and the char 'X' to 10"
+  [c]
+  (first (replace {33 10} (list (Character/getNumericValue c)))))
+
+(defn strike
+  [sc]
+  (let 
+    [pos3 (nth sc 2)]
+    (if (= pos3 \/)
+      20
+      (apply + (take 3 (map x-to-10 sc))))))
+
+(defn spare 
+  [sc]
+  (+ 10 (x-to-10 (nth sc 2))))
+  
+
+(defn ten-pin-score
+  ([sc]
+    (ten-pin-score (replace {\- \0} (seq sc)) 1 0))
+  ([sc frame score]
+;    (println sc " frame: " frame)
+    (if (> frame 10)
+      score
+      (if (= (first sc) \X)
+        (ten-pin-score (rest sc)
+                       (inc frame)
+                       (+ score (strike sc)))
+        (if(= (second sc) \/)
+              (ten-pin-score (drop 2 sc)
+                             (inc frame)
+                             (+ score (spare sc)))
+              (ten-pin-score 
+                (drop 2 sc) 
+                (inc frame) 
+                (+ score 
+                   (Character/getNumericValue (first sc))
+                   (Character/getNumericValue (second sc)))))))))
+
+(ten-pin-score "--3---2----1-8-11---") ;16
+
+(ten-pin-score "6/34----------------") ;20
+
+(ten-pin-score "----XX3-----------") ;39
+
+(ten-pin-score "726/-8-69/6/33456252") ;92
+
+(ten-pin-score "X52X52X52X52X52") ;120
+
+(ten-pin-score "X7/729/XXX236/7/3") ;168
+
+(ten-pin-score "XXXXX6/XX7/XX5") ;248
+  
 (defn -main
   [& args]
   )
